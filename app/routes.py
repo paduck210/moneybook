@@ -8,12 +8,32 @@ from flask import (
 from app import app, db
 from app.models import Usage, User, Receipt
 from flask_login import current_user, login_user, logout_user, login_required
-from app.forms import RegistrationForm
+from app.forms import RegistrationForm, ReceiptForm
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    form = ReceiptForm()
+    receipts = Receipt.query.filter_by(user_id=current_user.id).all()
+
+    if form.validate_on_submit():
+        if Usage.query.filter_by(name=form.usage.data).first():
+            usage = Usage.query.filter_by(name=form.usage.data).first()
+            receipt = Receipt(description=form.description.data, amount=form.amount.data, user_id=current_user.id, usage_id=usage.id)
+            db.session.add(receipt)
+            db.session.commit()
+            flash("New Receipt Added")
+        else:
+            usage = Usage(name=form.usage.data)
+            db.session.add(usage)
+            db.session.commit()
+            receipt = Receipt(description=form.description.data, amount=form.amount.data, user_id=current_user.id, usage_id=usage.id)
+            db.session.add(receipt)
+            db.session.commit()
+            flash("New Receipt Added")
+        return redirect('/index')
+
+    return render_template('index.html', form=form, receipts=receipts)
 
 
 @app.route('/login', methods=['GET'])
@@ -36,7 +56,7 @@ def login_POST():
         return redirect('/login')
 
     login_user(user)
-    return redirect('/todo')
+    return redirect('/index')
 
 
 @app.route('/logout')

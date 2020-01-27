@@ -1,8 +1,46 @@
 {% extends 'base.html' %}
 
-{% block app_content %}
-<!--    <h3>All posts</h3>-->
-<!--    {% for post in posts %}-->
-<!--        {% include "_post.html" %}-->
-<!--    {% endfor %}-->
+{% block content %}
+<div class="row no-gutters">
+    <div class="col-md-8 order-md-1">
+        <h1>List</h1>
+        <table class="table table-striped">
+            <th>#</th><th>Usage</th><th>Description</th><th>$</th>
+            {% for receipt in receipts %}
+                <tr>
+                    <td>{{ receipt.id }}</td>
+                    <td>{{ receipt.usage_name() }}</td>
+                    <td>{{ receipt.description }}</td>
+                    <td>$ {{ receipt.amount }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% if form %}
+    <div class="col-md-4 order-md-2 mb-4">
+        <h1>Add New Receipt</h1>
+        <table class="table">
+        <tr>
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+            <p>
+                {{ form.usage.label }}
+                {{ form.usage(cols=32, rows=4) }}<br>
+            </p>
+            <p>
+                {{ form.amount.label }}
+                {{ form.amount(cols=32, rows=4) }}<br>
+            </p>
+            <p>
+                {{ form.description.label }}
+                {{ form.description(cols=32, rows=4) }}<br>
+            </p>
+                 <p>{{ form.submit() }}</p>
+            </form>
+        </tr>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
 {% endblock %}

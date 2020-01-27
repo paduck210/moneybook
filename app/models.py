@@ -15,6 +15,11 @@ class Receipt(db.Model):
     def __repr__(self):
         return '<Receipt {}>'.format(self.amount)
 
+    def usage_name(self):
+        usage = Usage.query.filter_by(id=self.usage_id).first()
+        return usage.name
+
+
 
 class Usage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
